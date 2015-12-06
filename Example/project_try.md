@@ -17,12 +17,7 @@ logdnorm <- function(x){
 logddnorm <- function(x){
   -x
 }
-
-x <- seq(-5, 5, 0.01)
-plot(x, logdnorm(x), type="l")
 ```
-
-<img src="project_try_files/figure-html/unnamed-chunk-1-1.png" title="" alt="" style="display: block; margin: auto;" />
 
 # Main function pseudo code
 
@@ -56,31 +51,41 @@ experiment <- function(n, k, density_fun, ddensity_fun){
 # u and l function
 
 ```r
-u <- function(x1, z){
+#Function generate z
+zfun <- function(x, fun, fun_deriv){
+  (fun(x[-1]) - fun(x[-k]) - x[-1]*fun_deriv(x[-1]) + x[-k]*fun_deriv(x[-k]))/(fun_deriv(x[-k]) - fun_deriv(x[-1]))
+}
+
+u <- function(x1, x, z, fun, fun_deriv){
   #Construct upper and lower bound
   z <- c(-Inf, z, Inf)
   
   #Grouping
-  group <- cut(x1, breaks=z)
+  group <- cut(x1, breaks=z, labels=1:length(x))
   #Check which group the x1 locate
-  xj <- x[which(group == levels(group))]
+  xj <- x[as.numeric(group)]
   
-  #Compute value
-  logdnorm(xj) + (x1 - xj)*logddnorm(xj)
+  #Compute value, slope and intercept
+  value <- fun(xj) + (x1 - xj)*fun_deriv(xj)
+  a <- fun_deriv(x1)
+  b <- fun(x1) - a*x1
+  
+  out <- list(parameter=cbind(a, b), u=value)
+  out
 }
 
-l <- function(x1, x){
+l <- function(x1, x, fun){
   #Grouping
-  group <- cut(x1, breaks=x)
+  group <- cut(x1, breaks=x, labels=1:(length(x) - 1))
   #Check which group the x1 locate
-  xj <- x[which(group == levels(group))]
-  xjplus <- x[which(group == levels(group)) + 1]
+  xj <- x[as.numeric(group)]
+  xjplus <- x[as.numeric(group) + 1]
   
   #Compute value
-  all <- ((xjplus - x1)*logdnorm(xj) + (x1 - xj)*logdnorm(xjplus))/(xjplus - xj)
-  ifelse(identical(numeric(0), all),
-         -Inf,
-         all)
+  all <- ((xjplus - x1)*fun(xj) + (x1 - xj)*fun(xjplus))/(xjplus - xj)
+  all[is.na(all)] <- -Inf
+  
+  all
 }
 ```
 
@@ -93,24 +98,7 @@ l <- function(x1, x){
 k <- 5
 x <- seq(-0.5, 0.5, length.out=k)
 #Compute z
-z <- (logdnorm(x[-1]) - logdnorm(x[-k]) - x[-1]*logddnorm(x[-1]) + x[-k]*logddnorm(x[-k]))/(logddnorm(x[-k]) - logddnorm(x[-1]))
-```
-
-
-```r
-#function to plot tangent line and intersection
-plot.z <- function(x){
-  slope <- logddnorm(x)
-  intercept <- -(slope*x - logdnorm(x))
-  
-  for(i in 1:length(slope)){
-    abline(a=intercept[i], b=slope[i], lty=3, col="red")
-  }
-
-  z <- (logdnorm(x[-1]) - logdnorm(x[-k]) - x[-1]*logddnorm(x[-1]) + x[-k]*logddnorm(x[-k]))/(logddnorm(x[-k]) - logddnorm(x[-1]))
-  
-  abline(v=z, col="blue", lty=4)
-}
+z <- zfun(x, logdnorm, logddnorm)
 ```
 
 ### Intersection, upper and lower
@@ -127,22 +115,11 @@ abline(v=z, lty=2, col="blue")
 
 #Add upper and lower
 x1 <- seq(-1, 1, by=0.01)
-lines(x1, sapply(x1, u, z), col="green")
-lines(x1, sapply(x1, l, x), col="orange")
+lines(x1, u(x1, x, z, logdnorm, logddnorm)$u, col="green")
+lines(x1, l(x1, x, logdnorm), col="orange")
 
 legend("topright", lty=c(2, 1, 1), col=c("blue","green","orange"), legend=c("intersection", "upper", "lower"))
 ```
 
-<img src="project_try_files/figure-html/unnamed-chunk-6-1.png" title="" alt="" style="display: block; margin: auto;" />
-
-### Exponential of u function
-
-
-```r
-u_exp <- exp(sapply(x1, u, z))
-plot(x1, u_exp, type="l")
-abline(v=z)
-```
-
-<img src="project_try_files/figure-html/unnamed-chunk-7-1.png" title="" alt="" style="display: block; margin: auto;" />
+<img src="project_try_files/figure-html/unnamed-chunk-5-1.png" title="" alt="" style="display: block; margin: auto;" />
 
