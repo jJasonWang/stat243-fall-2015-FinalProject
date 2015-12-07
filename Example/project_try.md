@@ -49,26 +49,24 @@ experiment <- function(n, k, density_fun, ddensity_fun){
 # u and l function
 
 ```r
-#Function generate z
-zfun <- function(x, fun, fun_deriv){
-  (fun(x[-1]) - fun(x[-k]) - x[-1]*fun_deriv(x[-1]) + x[-k]*fun_deriv(x[-k]))/(fun_deriv(x[-k]) - fun_deriv(x[-1]))
-}
-
-u <- function(x1, x, z, fun, fun_deriv){
+#Function generate coefficient and breaks
+generate_u <- function(x, fun, fun_deriv){
+  z <- (fun(x[-1]) - fun(x[-k]) - x[-1]*fun_deriv(x[-1]) + x[-k]*fun_deriv(x[-k]))/(fun_deriv(x[-k]) - fun_deriv(x[-1]))
+  
   #Construct upper and lower bound
   z <- c(-Inf, z, Inf)
   
   #Grouping
-  group <- cut(x1, breaks=z, labels=1:length(x))
+  group <- cut(x, breaks=z, labels=1:length(x))
   #Check which group the x1 locate
   xj <- x[as.numeric(group)]
   
   #Compute value, slope and intercept
-  value <- fun(xj) + (x1 - xj)*fun_deriv(xj)
-  a <- fun_deriv(x1)
-  b <- fun(x1) - a*x1
+  value <- fun(xj) + (x - xj)*fun_deriv(xj)
+  a <- fun_deriv(x)
+  b <- fun(x) - a*x
   
-  out <- list(parameter=cbind(a, b), u=value)
+  out <- list(parameter=cbind(a, b), breaks=z)
   out
 }
 
@@ -103,61 +101,34 @@ area <- function(z, u){
 }
 ```
 
-# Visualization
-
 
 ```r
 #Initial point -0.5, 0.5
 #5 abscissaes
 k <- 5
 x <- seq(-0.5, 0.5, length.out=k)
-#Compute z
-z <- zfun(x, logdnorm, logddnorm)
+
+generate_u(x, logdnorm, logddnorm)
+```
+
+```
+$parameter
+         a          b
+[1,]  0.50 -0.7939385
+[2,]  0.25 -0.8876885
+[3,]  0.00 -0.9189385
+[4,] -0.25 -0.8876885
+[5,] -0.50 -0.7939385
+
+$breaks
+[1]   -Inf -0.375 -0.125  0.125  0.375    Inf
 ```
 
 ### Intersection, upper and lower
 
 
-```r
-#Density
-plot(seq(-1, 1, by=0.01), logdnorm(seq(-1, 1, by=0.01)), type="l", ylim=c(-1.1, -0.9))
-
-#Abscissae
-abline(v=x, lty=2)
-#Intersect
-abline(v=z, lty=2, col="blue")
-
-#Add upper and lower
-x1 <- seq(-1, 1, by=0.01)
-lines(x1, u(x1, x, z, logdnorm, logddnorm)$u, col="green")
-lines(x1, l(x1, x, logdnorm), col="orange")
-
-legend("topright", lty=c(2, 1, 1), col=c("blue","green","orange"), legend=c("intersection", "upper", "lower"))
-```
-
-<img src="project_try_files/figure-html/unnamed-chunk-5-1.png" title="" alt="" style="display: block; margin: auto;" />
 
 ### Upper function
 
-```r
-#For visualize I take an x with larger range
-x2 <- seq(-5, 5, by=0.1)
-u2 <- u(x2, x, z, logdnorm, logddnorm)
-plot(x2, exp(u2$u), type="l")
-#Intersect
-abline(v=z, lty=2, col="blue")
-```
-
-<img src="project_try_files/figure-html/unnamed-chunk-6-1.png" title="" alt="" style="display: block; margin: auto;" />
-
-```r
-#For compute area, we only need those points in Abscissae
-u1 <- u(x, x, z, logdnorm, logddnorm)
-area(z, u1)
-```
-
-```
-[1] 0.74954318 0.09668276 0.09973557 0.09668276 0.74954318
-```
 
 
