@@ -24,10 +24,8 @@ logddnorm <- function(x){
 ```r
 experiment <- function(n, k, density_fun, ddensity_fun){
   #Initital value
-  x <- seq(-0.5, 0.5, length.out=k)
-  
+
   #z
-  z <- (logdnorm(x[-1]) - logdnorm(x[-k]) - x[-1]*logddnorm(x[-1]) + x[-k]*logddnorm(x[-k]))/(logddnorm(x[-k]) - logddnorm(x[-1]))
   
   #Compute u
   
@@ -87,6 +85,22 @@ l <- function(x1, x, fun){
   
   all
 }
+
+area <- function(z, u){
+  area <- rep(0, length(z) + 1)
+  #Add upper and lower bound
+  z <- c(-Inf, z, Inf)
+  for(i in 1:length(area)){
+    #Update Coefficient
+    a <- u$parameter[i, 1]
+    b <- u$parameter[i, 2]
+    
+    #Compute area under the exponential
+    area[i] <- integrate(function(x, a, b) exp(a*x + b), z[i], z[i + 1], a=a, b=b)$value
+  }
+  
+  area
+}
 ```
 
 # Visualization
@@ -122,4 +136,28 @@ legend("topright", lty=c(2, 1, 1), col=c("blue","green","orange"), legend=c("int
 ```
 
 <img src="project_try_files/figure-html/unnamed-chunk-5-1.png" title="" alt="" style="display: block; margin: auto;" />
+
+### Upper function
+
+```r
+#For visualize I take an x with larger range
+x2 <- seq(-5, 5, by=0.1)
+u2 <- u(x2, x, z, logdnorm, logddnorm)
+plot(x2, exp(u2$u), type="l")
+#Intersect
+abline(v=z, lty=2, col="blue")
+```
+
+<img src="project_try_files/figure-html/unnamed-chunk-6-1.png" title="" alt="" style="display: block; margin: auto;" />
+
+```r
+#For compute area, we only need those points in Abscissae
+u1 <- u(x, x, z, logdnorm, logddnorm)
+area(z, u1)
+```
+
+```
+[1] 0.74954318 0.09668276 0.09973557 0.09668276 0.74954318
+```
+
 
