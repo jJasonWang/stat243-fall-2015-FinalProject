@@ -22,12 +22,12 @@
 
 sample_x <- function(mu,y){
   ## calculate the list of areas ##
-  z <- mu$break_points
+  z <- mu$breaks
   area <- rep(0, length(z)-1)
   for (i in 1:length(area)){
     # get parameters
-    a <- mu$parameters[i, 1]
-    b <- mu$parameters[i, 2]
+    a <- mu$parameter[i, 1]
+    b <- mu$parameter[i, 2]
     # compute area
     area[i] <- integrate(function(x, a, b) exp(a*x + b), z[i], z[i + 1], a=a, b=b)$value
   }
