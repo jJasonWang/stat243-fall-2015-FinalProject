@@ -35,3 +35,19 @@ l <- function(x1, x, fun){
   
   all
 }
+
+area <- function(z, u){
+  area <- rep(0, length(z) + 1)
+  #Add upper and lower bound
+  z <- c(-Inf, z, Inf)
+  for(i in 1:length(area)){
+    #Update Coefficient
+    a <- u$parameter[i, 1]
+    b <- u$parameter[i, 2]
+    
+    #Compute area under the exponential
+    area[i] <- integrate(function(x, a, b) exp(a*x + b), z[i], z[i + 1], a=a, b=b)$value
+  }
+  
+  area
+}
