@@ -1,12 +1,15 @@
-#Standard normal(log scale)
-logdnorm <- function(x){
-  -x^2/2 - log(2*pi)/2
+#It will be the function which user gives us
+fun <- function(x){
+  log(dnorm(x))
+}
+#Central difference
+h <- 1e-8
+fun_deriv <- function(x){
+  (fun(x + h) - fun(x - h))/(2*h)
 }
 
-#Derivative
-logddnorm <- function(x){
-  -x
-}
+fun_deriv(1:5)
+## [1] -1 -2 -3 -4 -5
 
 #5 abscissaes
 k <- 5
@@ -33,7 +36,7 @@ generate_u <- function(x, fun, fun_deriv){
   out
 }
 
-generate_u(x, logdnorm, logddnorm)
+generate_u(x, fun, fun_deriv)
 
 ## $parameter
 ##          a          b
@@ -62,7 +65,7 @@ l <- function(x1, x, fun){
 
 #x1 is the x-value which you want to evaluate l
 x1 <- seq(-1, 1, by=0.1)
-l(x1, x, logdnorm)
+l(x1, x, fun)
 ## [1]       -Inf       -Inf       -Inf       -Inf       -Inf
 ## [6]       -Inf -1.0064385 -0.9689385 -0.9439385 -0.9314385
 ## [11] -0.9189385 -0.9314385 -0.9439385 -0.9689385 -1.0064385
