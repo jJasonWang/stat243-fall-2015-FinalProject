@@ -60,7 +60,7 @@ eval_l <- function(x1, x, fun){
   #Compute value
   all <- ((xjplus - x1)*fun(xj) + (x1 - xj)*fun(xjplus))/(xjplus - xj)
   all[is.na(all)] <- -Inf
-  return all
+  return(all)
 }
 
 InitTk <- function(f,a = -Inf,b = Inf){
@@ -132,9 +132,11 @@ ARS <- function(n,func,start=Inf,end=Inf,fun_deriv=NULL){ #optional: derivative
     if(w <= exp(l.x-u.x)){
       sample[size] = x.temp
       size = size+1
-    }else if(w <= exp(func(x.temp))-u.x){
-      sample[size] = x.temp
-      size = size+1
+    }else{
+      if(w <= exp(func(x.temp))-u.x){
+        sample[size] = x.temp
+        size = size+1
+      }
       Tk = sort(c(Tk,x.temp))
       uk = genu(Tk,f)
       ##generate h.x and h.dev for checking concavity
@@ -145,3 +147,4 @@ ARS <- function(n,func,start=Inf,end=Inf,fun_deriv=NULL){ #optional: derivative
   }
   return(sample)
 }
+      
