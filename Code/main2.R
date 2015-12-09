@@ -156,8 +156,8 @@ ARS <- function(n, func, start=Inf, end=Inf, fun_deriv=NULL){
       result[size] <- x.temp
       size <- size + 1
     }else{
-      if(w <= exp(func(x.temp)) - u.x){
-        sample[size] <- x.temp
+      if(w <= exp(fun(x.temp) - u.x)){
+        result[size] <- x.temp
         size <- size + 1
       }
       Tk <- sort(c(Tk, x.temp))
@@ -168,7 +168,7 @@ ARS <- function(n, func, start=Inf, end=Inf, fun_deriv=NULL){
       #check concavity
     }
   }
-  return(sample)
+  return(result)
 }
 
 ARS(n=10, dnorm)
