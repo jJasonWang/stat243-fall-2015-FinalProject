@@ -1,19 +1,45 @@
 # Please run the function code first ""
 setwd("~/ps-stat243/final-project/Code")
 
-# dnorm
-fun <- function(x){
+# Test function 1 - dnorm 
+h <- function(x){
   log(dnorm(x))
 }
-fun_deriv <- function(x){
-  h = 1e-8
-  (fun(x + h) - fun(x - h))/(2*h)
+
+h_deriv <- function(x){
+  dx = 1e-8
+  (h(x + dx) - h(x - dx))/(2*dx)
 }
 
-InitTk(fun,fun_deriv,-Inf,Inf)
+InitTk(h, h_deriv,-Inf,Inf)
 
-InitTk(fun,fun_deriv,-100,Inf)
+InitTk(h, h_deriv,-50,Inf)
 
-InitTk(fun,fun_deriv,-Inf,10)
 
-InitTk(fun,fun_deriv,-10,10)
+# Test function 2 - Modified Laplace distribution
+# f(x) = exp(-|x^3|)/2
+h <- function(x){
+  return (-abs(x^3))
+}
+
+h_deriv <- function(x){
+  dx = 1e-8
+  (h(x + dx) - h(x - dx))/(2*dx)
+}
+
+InitTk(h,h_deriv,-Inf,25)
+
+InitTk(h,h_deriv,-10,10)
+
+# Test function 3 - t distribution
+# Not log-concave
+h <- function(x){
+  log(dt(x,1))
+}
+
+h_deriv <- function(x){
+  dx = 1e-8
+  (h(x + dx) - h(x - dx))/(2*dx)
+}
+
+InitTk(h, h_deriv,-Inf,Inf)
