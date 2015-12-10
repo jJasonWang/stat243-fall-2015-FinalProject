@@ -1,5 +1,4 @@
-# Please run the function code first ""
-setwd("~/ps-stat243/final-project/Code")
+# Please run the function code "initTk.R" first.
 
 # Test function 1 - dnorm 
 h <- function(x){
