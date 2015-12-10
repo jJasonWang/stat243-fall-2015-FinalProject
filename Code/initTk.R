@@ -7,7 +7,7 @@ InitTk <- function(fun, fun_deriv, start, end){
   m.max <- 500
   if ((start == -Inf) && (end == Inf)) {
     while (1){
-      mat.temp <- xfunp(dnorm(1))
+      mat.temp <- xfunp(rnorm(1,sd=100))
       if (mat.temp[2] != -Inf){
         break
       }
@@ -40,12 +40,19 @@ InitTk <- function(fun, fun_deriv, start, end){
     }    
   }  else if ((start == -Inf) && (end != Inf)) {
     while (1){
-      mat.temp <- xfunp(end - dexp(1))
+      mat.temp <- xfunp(end - rexp(1, rate=0.01))
       if (mat.temp[2] != -Inf){
         break
       }
     }
     mat <- mat.temp
+    while (1){
+      mat.temp <- xfunp(end - rexp(1, rate=0.01))
+      if (mat.temp[2] != -Inf){
+        mat <- rbind(mat, mat.temp)
+        break
+      }
+    }
     mat.temp.pre <- mat.temp
     while (mat.temp[3] < 0 && m < m.max) {
       mat.temp <- xfunp(mat.temp[1]-2^m)
@@ -59,12 +66,19 @@ InitTk <- function(fun, fun_deriv, start, end){
     }
   } else if ((start != -Inf) && (end == Inf)) {
     while (1){
-      mat.temp <- xfunp(start + dexp(1))
+      mat.temp <- xfunp(start + rexp(1, rate=0.01))
       if (mat.temp[2] != -Inf){
         break
       }
     }
     mat <- mat.temp
+    while (1){
+      mat.temp <- xfunp(start + rexp(1, rate=0.01))
+      if (mat.temp[2] != -Inf){
+        mat <- rbind(mat, mat.temp)
+        break
+      }
+    }
     mat.temp.pre <- mat.temp
     while (mat.temp[3] > 0 && m < m.max) {
       mat.temp <- xfunp(mat.temp[1] + 2^m)

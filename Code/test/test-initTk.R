@@ -12,7 +12,7 @@ fun_deriv <- function(x){
 
 InitTk(fun,fun_deriv,-Inf,Inf)
 
-InitTk(fun,fun_deriv,-10,Inf)
+InitTk(fun,fun_deriv,-100,Inf)
 
 InitTk(fun,fun_deriv,-Inf,10)
 
