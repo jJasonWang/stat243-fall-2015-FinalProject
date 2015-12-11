@@ -1,5 +1,12 @@
+---
+output: 
+  html_document: 
+    keep_md: yes
+---
 
-
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(eval=FALSE)
+```
 
 
 
@@ -14,8 +21,7 @@
 ### Way1: devtools
 
 Go to your directory which contain the folder `ars`. Then run the following code.
-
-```r
+```{r devtools}
 setwd('to your directory contain ars...')
 library(devtools)
 
@@ -29,8 +35,7 @@ After the above steps, you can run `library(ars)` and start to use the package.
 
 ### Way2: devtools + load_all
 
-
-```r
+```{r devtools2}
 setwd('to your directory contain ars...')
 library(devtools)
 
