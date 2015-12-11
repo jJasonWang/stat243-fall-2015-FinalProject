@@ -1,0 +1,9 @@
+{
+    "path" : "~/ars",
+    "sortOrder" : [
+        {
+            "ascending" : true,
+            "columnIndex" : 2
+        }
+    ]
+}

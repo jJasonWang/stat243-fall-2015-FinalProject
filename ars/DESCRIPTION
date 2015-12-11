@@ -1,0 +1,11 @@
+Package: ars
+Type: Package
+Title: Adaptive Rejection Sampling
+Version: 0.1
+Date: 2015-12-09
+Author: Chao Mao, Xian Shi, Chih-Hui Wang, Luyun Zhao
+Maintainer: Who to complain to <yourfault@somewhere.net>
+Description: More about what it does (maybe more than one line)
+License: What license is it under?
+LazyData: TRUE
+RoxygenNote: 5.0.1
