@@ -1,150 +1,326 @@
-## helper functions
-#generate sample x.temp
-sample_x <- function(mu,y){
-  ## calculate the list of areas ##
-  z <- mu$breaks
+# initTk： generate the initial set of abscissae.
+# Input:
+#    hfun: h(x)
+#    hfun_deriv: h'(x)
+#     start: lower bound
+#  	 end: upper bound
+# Output:
+#		 matrix (Tk, h(Tk), h'(Tk))
+
+initTk <- function(hfun, hfun_deriv, start, end){
+  
+  # Construct c(x, hfun, hfun_deriv)
+  xhfunp <- function(x){
+    return(c(x, hfun(x), hfun_deriv(x)))
+  }
+  
+  # Iteration parameters
+  m <- 1
+  m.max <- 50
+  
+  # Four different scenario regarding x intervals are considered:
+  # 1 - [-Inf, Inf]
+  # 2 - [-Inf, b]
+  # 3 - [a, Inf]
+  # 4 - [a, b]
+  if ((start == -Inf) && (end == Inf)) {
+    while (1){
+      mat.temp <- xhfunp(rnorm(1,sd=10))
+      if ((mat.temp[2] != -Inf) && (mat.temp[3] != 0) && (mat.temp[3] != -Inf)){
+        break
+      }
+    }
+    mat.temp.pre <- mat.temp
+    if (mat.temp[3] < 0){
+      mat <- mat.temp
+      while (mat.temp[3] <= 0 && m < m.max) {
+        mat.temp <- xhfunp(mat.temp[1]-(2^m)*runif(1))
+        if (mat.temp[3] < mat.temp.pre[3]){
+          stop("The input function is NOT Log-concave!")
+        } else {
+          mat <- rbind(mat, mat.temp)
+          mat.temp.pre <- mat.temp
+          m <- m + 1
+        }
+      }
+    } else if (mat.temp[3] > 0) {
+      mat <- mat.temp
+      while (mat.temp[3] >= 0 && m < m.max) {
+        mat.temp <- xhfunp(mat.temp[1]+(2^m)*runif(1))
+        if (mat.temp[3] > mat.temp.pre[3]){
+          stop("The input function is NOT Log-concave!")
+        } else {
+          mat <- rbind(mat, mat.temp)
+          mat.temp.pre <- mat.temp
+          m <- m + 1
+        }
+      }          
+    }    
+  }  else if ((start == -Inf) && (end != Inf)) {
+    while (1){
+      mat.temp <- xhfunp(end - rexp(1, rate=0.1))
+      if ((mat.temp[2] != -Inf) && (mat.temp[3] != 0) && (mat.temp[3] != -Inf)){
+        break
+      }
+    }
+    mat <- mat.temp
+    while (1){
+      mat.temp <- xhfunp(end - rexp(1, rate=0.1))
+      if ((mat.temp[2] != -Inf) && (mat.temp[3] != 0) && (mat.temp[3] != -Inf)){
+        mat <- rbind(mat, mat.temp)
+        break
+      }
+    }
+    mat.temp.pre <- mat.temp
+    while (mat.temp[3] <= 0 && m < m.max) {
+      mat.temp <- xhfunp(mat.temp[1] - (2^m)*runif(1))
+      if (mat.temp[3] < mat.temp.pre[3]){
+        stop("The input function is NOT Log-concave!")
+      } else {
+        mat <- rbind(mat, mat.temp)
+        mat.temp.pre <- mat.temp
+        m <- m + 1
+      }
+    }
+  } else if ((start != -Inf) && (end == Inf)) {
+    while (1){
+      mat.temp <- xhfunp(start + rexp(1, rate=0.01))
+      if ((mat.temp[2] != -Inf) && (mat.temp[3] != 0) && (mat.temp[3] != -Inf)){
+        break
+      }
+    }
+    mat <- mat.temp
+    while (1){
+      mat.temp <- xhfunp(start + rexp(1, rate=0.01))
+      if ((mat.temp[2] != -Inf) && (mat.temp[3] != 0) && (mat.temp[3] != -Inf)){
+        mat <- rbind(mat, mat.temp)
+        break
+      }
+    }
+    mat.temp.pre <- mat.temp
+    while (mat.temp[3] >= 0 && m < m.max) {
+      mat.temp <- xhfunp(mat.temp[1] + (2^m)*runif(1))
+      if (mat.temp[3] > mat.temp.pre[3]){
+        stop("The input function is NOT Log-concave!")
+      } else {
+        mat <- rbind(mat, mat.temp)
+        mat.temp.pre <- mat.temp
+        m <- m + 1
+      }
+    }
+  }  else {
+    a <- start + (end-start)/3
+    b <- end - (end-start)/3
+    mat <- rbind(xhfunp(a), xhfunp(b))
+  }
+  if (m == m.max){
+    stop("Failed to find initial abscissae!
+         1, The input function might have extremely large standard derivation.
+         Reduce your standard derivation and try agian if applicable!
+         2, The input function might be a modified exponential distribution.
+         Use R built-in function dexp to sample if applicable!")
+  }
+  mat <- mat[order(mat[, 1]), ]
+  return(mat)
+  }
+
+# genu： generate the parameters and breaking points used in the u(x) function
+# Input:
+#    Tk: a vector of x in Tk
+#    hfun.x: values of h(x)
+#		 hfun_deriv.x: deravative values of h(x) 
+#		 start: lower bound
+#		 end: upper bound
+# Output:
+#		 parameters and breaking points used in the u(x) function
+
+genu <- function(mat, start, end){
+  
+  # Calculate z vector
+  Tk <- mat[, 1]
+  hfun.x <- mat[, 2]
+  hfun_deriv.x <- mat[, 3]
+  k <- length(Tk)
+  
+  z <- (hfun.x[-1] - hfun.x[-k] - Tk[-1] * hfun_deriv.x[-1] + Tk[-k] * hfun_deriv.x[-k])/(hfun_deriv.x[-k] - hfun_deriv.x[-1])
+  if (sum(hfun_deriv.x[-k] - hfun_deriv.x[-1] == 0) > 0){
+    stop("Failed to calculate z values as two adjacent points have identical derivatives!
+         1, The input function might have extremely large standard derivation.
+         Reduce your standard derivation and try agian if applicable!
+         2, The input function might be a modified exponential distribution.
+         Use R built-in function dexp to sample if applicable!")
+  }
+  
+  # Construct upper and lower bound
+  z <- c(start, z, end)
+  
+  # Compute slope and intercept
+  a <- hfun_deriv.x
+  b <- hfun.x - a * Tk
+  
+  res <- list(parameter=cbind(a, b), breaks = z)
+  return(res)
+  }
+
+# samplex： generate a value of x* from s(x)
+# Input:
+#    u: the output of the generate_u() function, i.e. a list of the parameters and breaking points
+#    y: a random value from 0 to 1, can also be a vector
+# Output:
+#		 a vector of sampled x* with the same length of y
+
+samplex <- function(u, y){
+  
+  # Inverse CDF method is used.
+  # Calculate the list of areas
+  z <- u$breaks
   area <- rep(0, length(z)-1)
-  for (i in 1:length(area)){
-    # get parameters
-    a <- mu$parameter[i, 1]
-    b <- mu$parameter[i, 2]
-    # compute area
-    area[i] <- integrate(function(x, a, b) exp(a*x + b), z[i], z[i + 1], a=a, b=b)$value
-  }
+  a <- u$parameter[, 1]
+  b <- u$parameter[, 2]
+  area <- (exp(a*z[-1]+b)-exp(a*z[-length(z)]+b))/a
   
-  ## determine which interval y falls in ##
-  chosen_area <- y*sum(area)
-  cum_area <- c(0,cumsum(area))
-  index <- findInterval(chosen_area,cum_area)
-  sub_area <- chosen_area-cum_area[index]
+  # Determine which interval y falls in
+  chosen.area <- y*sum(area)
+  cum.area <- c(0,cumsum(area))
+  index <- findInterval(chosen.area,cum.area)
+  area.star <- chosen.area-cum.area[index]
   
-  ## find the corresponding x values ##
-  x_star <- rep(0,length(y))
-  for (j in 1:length(index)){
-    i <- index[j]
-    a <- mu$parameter[i, 1]
-    b <- mu$parameter[i, 2]
-    z_star <- z[i]
-    area_star <- sub_area[j]
-    xx_star <- (log(a*area_star+exp(a*z_star+b))-b)/a
-    x_star[j] <- xx_star
-  }
-  return(x_star)
+  # Find the corresponding x values
+  x.star <- rep(0, length(y))
+  z.star <- z[index]
+  a.idx <- a[index]
+  b.idx <- b[index]
+  x.star <- (log(a.idx * area.star + exp( a.idx * z.star + b.idx))-b.idx)/a.idx
+  return(x.star)
 }
 
-eval_u <- function(x.temp,u){
-  # evalu: evaluate u(x) at temp.x
-  # Input:
-  #   temp.x, given x value
-  #   u, u function parameters
-  # Output:
-  #   u.val, u value at temp.x
+# evalu： get the value of the function u(x) at x.temp
+# Input:
+#    x.temp: the point at which we want to evaluate u(x)
+#    u: the output of the generate_u() function, i.e. a list of the parameters and breaking points
+# Output:
+#		 a value of u(x)
+
+evalu <- function(x.temp, u){
   
-  # Check if temp.x is out of bounds.
-  if (x.temp < head(u$breaks,n=1) || x.temp > tail(u$breaks,n=1)){
-    stop("x.temp is out of bound.")
-  }
+  # Check if x.temp is out of bounds.
+  # if (x.temp < head(u$breaks,n=1) || x.temp > tail(u$breaks,n=1)){
+  #   stop("x.temp is out of bound.")
+  # }
   
   ind <- sum(u$breaks <= x.temp)
   u.val <- u$parameter[ind,1] * x.temp + u$parameter[ind,2]
   return(as.numeric(u.val))
 }
 
-eval_l <- function(x1, x, fun){
-  #Grouping
-  group <- cut(x1, breaks=x, labels=1:(length(x) - 1))
-  #Check which group the x1 locate
-  xj <- x[as.numeric(group)]
-  xjplus <- x[as.numeric(group) + 1]
+# evall： get the value of the function l(x) at x1
+# Input:
+#    x1: the point at which we want to evaluate l(x)
+#    x: the breaking points of l(x), i.e. the values of x in Tk
+#		 fun: h(x)
+# Output:
+#		 a value of l(x1)
+
+evall <- function(x1, Tk, hfun.x){
   
-  #Compute value
-  all <- ((xjplus - x1)*fun(xj) + (x1 - xj)*fun(xjplus))/(xjplus - xj)
-  all[is.na(all)] <- -Inf
-  return(all)
+  k <- length(Tk)
+  # Grouping
+  group <- cut(x1, breaks = Tk, labels=1:(k-1))
+  # Check which group the x1 locate
+  
+  xj.index <- as.numeric(group)
+  xj <- Tk[xj.index]
+  xjplus <- Tk[xj.index + 1]
+  
+  # Compute value
+  res <- ((xjplus - x1)*hfun.x[xj.index] + (x1 - xj)*hfun.x[xj.index+1])/(xjplus - xj)
+  res[is.na(res)] <- -Inf
+  return(res)
 }
 
-InitTk <- function(f,a = -Inf,b = Inf){
-  # InitTk: generate the initial Tk set before sampling.
-  # Input:
-  #   f, sampling function
-  #   a, lower bound
-  #   b, upper bound
-  #   k, length of Tk
-  # Output:
-  #   Tk, a set of x values
-  # TODO: check the existance of multiple minima? equivalent to log-concave check.
-  # TODO: log(0) situation
-  
-  # Construct the minimization function in order to find Mode.
-  mlogf <- function(x){
-    y <- f(x)
-    if (y == 0){
-      stop("Probability density function f(x) of certain x values within the given bounds are zero.
-           It can be caused if the given probability density function approximates very small values as 0.
-           Please narrow the bound input or contact the corresponding authors of the input function.")
-    }
-    return(-log(y))
-    }
-  
-  # Calculate Tk
-  if ((a == -Inf) && (b == Inf)) {
-    x.init <- 0
-    opt.res <- optim(x.init, mlogf, method="BFGS")
-    Tk <- c(opt.res$par - 1, opt.res$par + 1)
-  }  else if ((a == -Inf) && (b != Inf)) {
-    x.init <- b - abs(b)/2
-    opt.res <- optim(x.init, mlogf, method="BFGS")
-    Tk <- c(opt.res$par - 1, (opt.res$par + b)/2)
-  }  else if ((a != -Inf) && (b == Inf)) {
-    x.init <- a + abs(a)/2
-    opt.res <- optim(x.init, mlogf, method="BFGS")
-    Tk <- c((opt.res$par + a)/2, opt.res$par + 1)
-  }  else {
-    x.init <- (a + b)/2
-    opt.res <- optim(x.init, mlogf, method="BFGS")
-    Tk <- c((opt.res$par + a)/2, (opt.res$par + b)/2)
-  }
-  return(Tk)
-}
 
-## main function
-ARS <- function(n,func,start=Inf,end=Inf,fun_deriv=NULL){ #optional: derivative
-  ## the func should be a function has the form e.g.func(x){return(x^2)}
-  #check func is concave
-  #normalize?
+# ars： main function
+# Input:
+#    n: the number of points we want to sample
+#    func: the density function of interest, not need to be normalized
+#		 start: lower bound (optional)
+# 	 end: upper bound (optional)
+#    fun_deriv: the deravative of the density function (optional)
+# Output:
+#		 a vector of sampled x of length n
+
+ars <- function(n, func, start=-Inf, end=Inf, hfun_deriv=NULL, ...){
   
-  #get derivative function by Central difference
-  if(is.null(fun_deriv)){
-    fun_deriv <- function(x){
-      h <- 1e-8
-      (func(x + h) - func(x - h))/(2*h)
+  # Construct h(x).
+  # Check whether users provide "log" keywords;
+  # It most likely happens when the input function is R built-in functions
+  # with log = TRUE options.
+  if(any(names(formals(func)) == "log")){
+    hfun <- function(x){
+      func(x, ..., log=TRUE)
+    }
+  }else{
+    hfun <- function(x){
+      log(func(x, ...))
     }
   }
-  Tk = InitTk(func)  #sorted?
-  sample=numeric(n) #the resulting sample x*'s
-  size=1
-  uk = generate_u(Tk,f)
-  while (size < n){
-    x.temp = sample_x(uk)
-    u.x = eval_u(x.temp,uk)
-    l.x = eval_l(Tk,x.temp,func)
-    w=runif(0,1)
-    if(w <= exp(l.x-u.x)){
-      sample[size] = x.temp
-      size = size+1
-    }else{
-      if(w <= exp(func(x.temp))-u.x){
-        sample[size] = x.temp
-        size = size+1
-      }
-      Tk = sort(c(Tk,x.temp))
-      uk = generate_u(Tk,f)
-      ##generate h.x and h.dev for checking concavity
-      h.x = sapply(Tk, func)
-      h.dev = sapply(Tk, fun_deriv)
-      #check concavity
+  
+  # Construct h'(x) by central difference.
+  # Check whether users provide deriv function.
+  if(is.null(hfun_deriv)){
+    h <- 1e-8
+    hfun_deriv <- function(x){
+      (hfun(x + h) - hfun(x - h))/(2*h)
     }
   }
-  return(sample)
-}
+  
+  # Parameters initialization
+  result <- rep(0, n)  # Array of result
+  size <- 1 # Count
+  mat <- initTk(hfun, hfun_deriv, start, end) # Initial abscissae with corresponding h(x) and h'(x)
+  u <- genu(mat, start, end) # Generate u(x) corresponding to initial abscissae
+  
+  while (size <= n){
+    # Sample from s(x)
+    y <- runif(min(size, n-size+1))
+    x.temp.mat <- samplex(u, y)
+    for (i in 1:length(x.temp.mat)){
+      x.temp <- x.temp.mat[i]
+      # Compute upper and lower value
+      u.x <- evalu(x.temp, u)
+      l.x <- evall(x.temp, mat[, 1], mat[, 2])
       
+      # Uniform random number to decide wether accept or reject
+      w = runif(1)
+      if(w <= exp(l.x - u.x)){
+        # Accept
+        result[size] <- x.temp
+        size <- size + 1
+      } else {
+        hfun.temp <- hfun(x.temp)
+        hfun_deriv.temp <- hfun_deriv(x.temp)
+        if(w <= exp(hfun.temp - u.x)){
+          # Accept
+          result[size] <- x.temp
+          size <- size + 1
+        }
+        # If the density of the point is too small, sample again
+        
+        if((is.finite(hfun.temp)) && (is.finite(hfun_deriv.temp)) 
+           && (hfun_deriv.temp != 0) && (sum(mat[, 3] == hfun_deriv.temp) == 0)){
+          # Reject, Update point
+          mat <- rbind(mat, c(x.temp, hfun.temp, hfun_deriv.temp))
+          mat <- mat[order(mat[, 1]), ]
+          u <- genu(mat, start, end)
+          
+          # Numerical check for concavity
+          h.dev <- mat[, 3]
+          if (all(diff(h.dev)<=0)==FALSE){
+            stop("The input function is NOT Log-concave!")
+          }
+        }
+      }
+    }
+  }
+  return(result)
+}
