@@ -4,7 +4,7 @@
 \alias{ARS}
 \title{ARS}
 \usage{
-ARS(n, func, start = -Inf, end = Inf, fun_deriv = NULL, ...)
+ARS(n, func, start = -Inf, end = Inf, hfun_deriv = NULL, ...)
 }
 \arguments{
 \item{n}{number of sample size.}
@@ -13,7 +13,7 @@ ARS(n, func, start = -Inf, end = Inf, fun_deriv = NULL, ...)
 
 \item{end}{upper bound. (optional)}
 
-\item{fun_deriv}{the derivative of the density function. (optional)}
+\item{hfun_deriv}{the derivative of the density function. (optional)}
 
 \item{...}{further arguments passed to or from other methods.}
 
