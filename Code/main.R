@@ -1,9 +1,8 @@
-# initTk： generate the initial set of abscissae.
 # Input:
 #    hfun: h(x)
 #    hfun_deriv: h'(x)
 #     start: lower bound
-#  	 end: upper bound
+#     end: upper bound
 # Output:
 #		 matrix (Tk, h(Tk), h'(Tk))
 
@@ -35,25 +34,17 @@ initTk <- function(hfun, hfun_deriv, start, end){
       mat <- mat.temp
       while (mat.temp[3] <= 0 && m < m.max) {
         mat.temp <- xhfunp(mat.temp[1]-(2^m)*runif(1))
-        if (mat.temp[3] < mat.temp.pre[3]){
-          stop("The input function is NOT Log-concave!")
-        } else {
-          mat <- rbind(mat, mat.temp)
-          mat.temp.pre <- mat.temp
-          m <- m + 1
-        }
+        mat <- rbind(mat, mat.temp)
+        mat.temp.pre <- mat.temp
+        m <- m + 1
       }
     } else if (mat.temp[3] > 0) {
       mat <- mat.temp
       while (mat.temp[3] >= 0 && m < m.max) {
         mat.temp <- xhfunp(mat.temp[1]+(2^m)*runif(1))
-        if (mat.temp[3] > mat.temp.pre[3]){
-          stop("The input function is NOT Log-concave!")
-        } else {
-          mat <- rbind(mat, mat.temp)
-          mat.temp.pre <- mat.temp
-          m <- m + 1
-        }
+        mat <- rbind(mat, mat.temp)
+        mat.temp.pre <- mat.temp
+        m <- m + 1
       }          
     }    
   }  else if ((start == -Inf) && (end != Inf)) {
@@ -74,13 +65,9 @@ initTk <- function(hfun, hfun_deriv, start, end){
     mat.temp.pre <- mat.temp
     while (mat.temp[3] <= 0 && m < m.max) {
       mat.temp <- xhfunp(mat.temp[1] - (2^m)*runif(1))
-      if (mat.temp[3] < mat.temp.pre[3]){
-        stop("The input function is NOT Log-concave!")
-      } else {
-        mat <- rbind(mat, mat.temp)
-        mat.temp.pre <- mat.temp
-        m <- m + 1
-      }
+      mat <- rbind(mat, mat.temp)
+      mat.temp.pre <- mat.temp
+      m <- m + 1
     }
   } else if ((start != -Inf) && (end == Inf)) {
     while (1){
@@ -100,13 +87,9 @@ initTk <- function(hfun, hfun_deriv, start, end){
     mat.temp.pre <- mat.temp
     while (mat.temp[3] >= 0 && m < m.max) {
       mat.temp <- xhfunp(mat.temp[1] + (2^m)*runif(1))
-      if (mat.temp[3] > mat.temp.pre[3]){
-        stop("The input function is NOT Log-concave!")
-      } else {
-        mat <- rbind(mat, mat.temp)
-        mat.temp.pre <- mat.temp
-        m <- m + 1
-      }
+      mat <- rbind(mat, mat.temp)
+      mat.temp.pre <- mat.temp
+      m <- m + 1
     }
   }  else {
     a <- start + (end-start)/3
