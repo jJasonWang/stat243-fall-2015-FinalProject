@@ -120,12 +120,12 @@ ARS <- function(n,func,start=Inf,end=Inf,fun_deriv=NULL){ #optional: derivative
       (func(x + h) - func(x - h))/(2*h)
     }
   }
-  Tk = intTk(func)  #sorted?
+  Tk = InitTk(func)  #sorted?
   sample=numeric(n) #the resulting sample x*'s
   size=1
-  uk = genu(Tk,f)
+  uk = generate_u(Tk,f)
   while (size < n){
-    x.temp = sampleXstar(uk)
+    x.temp = sample_x(uk)
     u.x = eval_u(x.temp,uk)
     l.x = eval_l(Tk,x.temp,func)
     w=runif(0,1)
@@ -138,7 +138,7 @@ ARS <- function(n,func,start=Inf,end=Inf,fun_deriv=NULL){ #optional: derivative
         size = size+1
       }
       Tk = sort(c(Tk,x.temp))
-      uk = genu(Tk,f)
+      uk = generate_u(Tk,f)
       ##generate h.x and h.dev for checking concavity
       h.x = sapply(Tk, func)
       h.dev = sapply(Tk, fun_deriv)

@@ -1,0 +1,17 @@
+{
+    "contents" : "\\name{hello}\n\\alias{hello}\n\\title{Hello, World!}\n\\usage{\nhello()\n}\n\\description{\nPrints 'Hello, world!'.\n}\n\\examples{\nhello()\n}\n",
+    "created" : 1449727394692.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3093437535",
+    "id" : "18E7E326",
+    "lastKnownWriteTime" : 1449725137,
+    "path" : "~/ars/man/hello.Rd",
+    "project_path" : "man/hello.Rd",
+    "properties" : {
+    },
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "type" : "r_doc"
+}
