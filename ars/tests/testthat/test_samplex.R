@@ -1,5 +1,5 @@
 library(ars)
-context("Testing the sampling function samplex(u,y)")
+context("Testing the sampling function samplex()")
 
 test_that("test the sampling function with some given u and y",{
   a <- c(3,-1,-10)

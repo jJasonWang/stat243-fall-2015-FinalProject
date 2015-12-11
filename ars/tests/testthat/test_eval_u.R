@@ -1,5 +1,5 @@
 library(ars)
-context("evaluate envelope function with given x value")
+context("Testing envelope function evalu() with given x value")
 
 test_that("eavluate envelope function gives upper bound value",{
   Tk = c(-1,1)

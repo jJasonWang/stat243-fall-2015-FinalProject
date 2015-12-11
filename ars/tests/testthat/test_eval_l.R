@@ -1,5 +1,5 @@
 library(ars)
-context("evaluate squeezing function l(x) given x")
+context("Testing squeezing function evall() given x")
 
 test_that("evaluate lower bound value with given x",{
   Tk=c(0,1)

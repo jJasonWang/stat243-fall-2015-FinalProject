@@ -1,5 +1,5 @@
 library(ars)
-context("Adaptive Rejection Sampling")
+context("Testing main function")
 
 test_that("sampling density is same with given density",{
   set.seed(0)

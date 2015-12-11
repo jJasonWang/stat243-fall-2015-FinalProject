@@ -1,5 +1,5 @@
 library(ars)
-context("generate envelope function u(x)")
+context("Testing the function genu() to generate right parameters and breaks")
 
 test_that("generate envelope function gives right parameters and breaks",{
   Tk = c(-1,1)
