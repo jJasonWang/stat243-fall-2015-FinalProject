@@ -24,3 +24,7 @@ tf2 <- function(x){
 tf3 <- function(x){
   return (x*(1-x)^4)
 }
+
+# Accurary test
+
+# Performance test

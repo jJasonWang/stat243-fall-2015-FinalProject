@@ -1,3 +1,12 @@
+# InitTk： generate the initial set of abscissae.
+# Input:
+#    hfun: h(x)
+#    hfun_deriv: h'(x)
+#  	 start: lower bound
+#		 end: upper bound
+# Output:
+#		 matrix (Tk, h(Tk), h'(Tk))
+
 InitTk <- function(hfun, hfun_deriv, start, end){
   xhfunp <- function(x){
     return(c(x, hfun(x), hfun_deriv(x)))
