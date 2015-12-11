@@ -19,24 +19,33 @@
 #' InitTk(hfun, hfun_deriv, -Inf, Inf)
 
 
-InitTk <- function(hfun, hfun_deriv, start, end){
+initTk <- function(hfun, hfun_deriv, start, end){
+
+  # Construct c(x, hfun, hfun_deriv)
   xhfunp <- function(x){
     return(c(x, hfun(x), hfun_deriv(x)))
   }
 
+  # Iteration parameters
   m <- 1
-  m.max <- 500
-  if ((start == -Inf) & (end == Inf)){
+  m.max <- 50
+
+  # Four different scenario regarding x intervals are considered:
+  # 1 - [-Inf, Inf]
+  # 2 - [-Inf, b]
+  # 3 - [a, Inf]
+  # 4 - [a, b]
+  if ((start == -Inf) && (end == Inf)) {
     while (1){
       mat.temp <- xhfunp(rnorm(1,sd=10))
-      if (mat.temp[2] != -Inf){
+      if ((mat.temp[2] != -Inf) && (mat.temp[3] != 0) && (mat.temp[3] != -Inf)){
         break
       }
     }
     mat.temp.pre <- mat.temp
     if (mat.temp[3] < 0){
       mat <- mat.temp
-      while (mat.temp[3] < 0 & m < m.max) {
+      while (mat.temp[3] <= 0 && m < m.max) {
         mat.temp <- xhfunp(mat.temp[1]-2^m)
         if (mat.temp[3] < mat.temp.pre[3]){
           stop("The input function is NOT Log-concave!")
@@ -48,7 +57,7 @@ InitTk <- function(hfun, hfun_deriv, start, end){
       }
     } else if (mat.temp[3] > 0) {
       mat <- mat.temp
-      while (mat.temp[3] > 0 && m < m.max) {
+      while (mat.temp[3] >= 0 && m < m.max) {
         mat.temp <- xhfunp(mat.temp[1]+2^m)
         if (mat.temp[3] > mat.temp.pre[3]){
           stop("The input function is NOT Log-concave!")
@@ -75,8 +84,8 @@ InitTk <- function(hfun, hfun_deriv, start, end){
       }
     }
     mat.temp.pre <- mat.temp
-    while (mat.temp[3] < 0 & m < m.max) {
-      mat.temp <- xhfunp(mat.temp[1] - 2^m)
+    while (mat.temp[3] < 0 && m < m.max) {
+      mat.temp <- xhfunp(mat.temp[1]-2^m)
       if (mat.temp[3] < mat.temp.pre[3]){
         stop("The input function is NOT Log-concave!")
       } else {
@@ -85,7 +94,7 @@ InitTk <- function(hfun, hfun_deriv, start, end){
         m <- m + 1
       }
     }
-  } else if ((start != -Inf) & (end == Inf)) {
+  } else if ((start != -Inf) && (end == Inf)) {
     while (1){
       mat.temp <- xhfunp(start + rexp(1, rate=0.01))
       if (mat.temp[2] != -Inf){
@@ -101,7 +110,7 @@ InitTk <- function(hfun, hfun_deriv, start, end){
       }
     }
     mat.temp.pre <- mat.temp
-    while (mat.temp[3] > 0 & m < m.max) {
+    while (mat.temp[3] > 0 && m < m.max) {
       mat.temp <- xhfunp(mat.temp[1] + 2^m)
       if (mat.temp[3] > mat.temp.pre[3]){
         stop("The input function is NOT Log-concave!")
@@ -115,6 +124,11 @@ InitTk <- function(hfun, hfun_deriv, start, end){
     a <- start + (end-start)/3
     b <- end - (end-start)/3
     mat <- rbind(xhfunp(a), xhfunp(b))
+  }
+  if (m == m.max){
+    stop("Failed to find initial abscissae!
+         It might result from extremely large standard derivation.
+         Reduce your standard derivation and try agian if applicable!")
   }
   mat <- mat[order(mat[, 1]), ]
   return(mat)

@@ -11,17 +11,19 @@
 #' @examples
 #'
 
-eval_l <- function(x1, x, hfun){
-  k <- length(x)
+evall <- function(x1, Tk, hfun.x){
 
-  #Grouping
-  group <- cut(x1, breaks=x, labels=1:(k - 1))
-  #Check which group the x1 locate
-  xj <- x[as.numeric(group)]
-  xjplus <- x[as.numeric(group) + 1]
+  k <- length(Tk)
+  # Grouping
+  group <- cut(x1, breaks = Tk, labels=1:(k-1))
+  # Check which group the x1 locate
 
-  #Compute value
-  all <- ((xjplus - x1)*hfun(xj) + (x1 - xj)*hfun(xjplus))/(xjplus - xj)
-  all[is.na(all)] <- -Inf
-  return(all)
+  xj.index <- as.numeric(group)
+  xj <- Tk[xj.index]
+  xjplus <- Tk[xj.index + 1]
+
+  # Compute value
+  res <- ((xjplus - x1)*hfun.x[xj.index] + (x1 - xj)*hfun.x[xj.index+1])/(xjplus - xj)
+  res[is.na(res)] <- -Inf
+  return(res)
 }

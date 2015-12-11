@@ -1,12 +1,12 @@
-#' ARS
+#' ars
 #'
 #' Adaptive rejection sampling
 #'
 #' @param n number of sample size.
-#' @param fun the density function of interest, not need to be normalized.
-#' @param hfun_deriv the derivative of the density function. (optional)
+#' @param func the density function of interest, not need to be normalized.
 #' @param start lower bound. (optional)
 #' @param end upper bound. (optional)
+#' @param hfun_deriv the derivative of the density function. (optional)
 #' @param ... further arguments passed to or from other methods.
 #' @return a vector of sample from the density function with length n
 #' @author Chao Mao, Xian Shi, Chih-Hui Wang, Luyun Zhao
@@ -17,10 +17,12 @@
 #' n <- 100
 #' ARS(n, dnorm)
 
-ARS <- function(n, func, start=-Inf, end=Inf, hfun_deriv=NULL, ...){
-  #####Need to do: check func is concave, normalize?#####
+ars <- function(n, func, start=-Inf, end=Inf, hfun_deriv=NULL, ...){
 
-  #Check if the input function
+  # Construct h(x).
+  # Check whether users provide "log" keywords;
+  # It most likely happens when the input function is R built-in functions
+  # with log = TRUE options.
   if(any(names(formals(func)) == "log")){
     hfun <- function(x){
       func(x, ..., log=TRUE)
@@ -31,7 +33,8 @@ ARS <- function(n, func, start=-Inf, end=Inf, hfun_deriv=NULL, ...){
     }
   }
 
-  #Get derivative function by Central difference
+  # Construct h'(x) by central difference.
+  # Check whether users provide deriv function.
   if(is.null(hfun_deriv)){
     h <- 1e-8
     hfun_deriv <- function(x){
@@ -39,55 +42,48 @@ ARS <- function(n, func, start=-Inf, end=Inf, hfun_deriv=NULL, ...){
     }
   }
 
-  ######Question: sorted?#####
-  #Initial Value
-  mat <- InitTk(hfun, hfun_deriv, start, end)
-  Tk <- mat[, 1]
-
-  #Set up
-  result <- rep(0, n)
-  size <- 1
-
-  #Generate u
-  uk <- generate_u(Tk, mat[, 2], mat[, 3], start, end)
+  # Parameters initialization
+  result <- rep(0, n)  # Array of result
+  size <- 1 # Count
+  mat <- initTk(hfun, hfun_deriv, start, end) # Initial abscissae with corresponding h(x) and h'(x)
+  u <- genu(mat, start, end) # Generate u(x) corresponding to initial abscissae
 
   while (size <= n){
-    #Sample from s(x)
+    # Sample from s(x)
     y <- runif(1)
-    x.temp <- sample_x(uk, y)
+    x.temp <- samplex(u, y)
 
-    #Compute upper and lower value
-    u.x <- eval_u(x.temp, uk)
-    l.x <- eval_l(x.temp, Tk, hfun)
+    # Compute upper and lower value
+    u.x <- evalu(x.temp, u)
+    l.x <- evall(x.temp, mat[, 1], mat[, 2])
 
-    #Uniform random number to decide wether accept or reject
-    w=runif(1)
+    # Uniform random number to decide wether accept or reject
+    w = runif(1)
     if(w <= exp(l.x - u.x)){
-      #Accept
+      # Accept
       result[size] <- x.temp
       size <- size + 1
     }else{
-      if(w <= exp(hfun(x.temp) - u.x)){
-        #Accept
+      hfun.temp <- hfun(x.temp)
+      hfun_deriv.temp <- hfun_deriv(x.temp)
+      if(w <= exp(hfun.temp - u.x)){
+        # Accept
         result[size] <- x.temp
         size <- size + 1
       }
-      #If the density of the point is too small, sample again
-      if(!is.infinite(hfun(x.temp))){
-        #Reject, Update point
-        mat <- rbind(mat, c(x.temp, hfun(x.temp), hfun_deriv(x.temp)))
+      # If the density of the point is too small, sample again
 
-        #Sort by Tk
+      if((is.finite(hfun.temp)) && (is.finite(hfun_deriv.temp))
+         && (hfun_deriv.temp != 0) && (sum(mat[, 3] == hfun_deriv.temp) == 0)){
+        # Reject, Update point
+        mat <- rbind(mat, c(x.temp, hfun.temp, hfun_deriv.temp))
         mat <- mat[order(mat[, 1]), ]
-        Tk <- mat[, 1]
+        u <- genu(mat, start, end)
 
-        uk <- generate_u(Tk, mat[, 2], mat[, 3], start, end)
-
-        ##generate h.x and h.dev for checking concavity
-        ######check concavity#####
+        # Numerical check for concavity
         h.dev <- mat[, 3]
         if (all(diff(h.dev)<=0)==FALSE){
-          stop("Not log concave!")
+          stop("The input function is NOT Log-concave!")
         }
       }
     }
