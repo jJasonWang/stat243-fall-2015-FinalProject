@@ -7,16 +7,16 @@
 initTk(hfun, hfun_deriv, start, end)
 }
 \arguments{
-\item{hfun}{log density function of interest, not need to be normalized.}
+\item{hfun}{log of the density function.}
 
-\item{hfun_deriv}{the derivative of log density function.}
+\item{hfun_deriv}{the derivatives of log density function.}
 
-\item{start}{lower bound.}
+\item{start}{lower bound of the density function.}
 
-\item{end}{upper bound.}
+\item{end}{upper bound of the density function.}
 }
 \value{
-A k by 3 matrix. First column is initial value. Second column is the log function value of initial value. Thrid column is the derivative of the log function of initial value.
+a k by 3 matrix which its first column are initial points, second column are log of the density function and third column are the derivatives of log density function. k is the total number of initial points.
 }
 \description{
 Generate the initial value for Adaptive rejection sampling

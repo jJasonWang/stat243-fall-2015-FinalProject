@@ -7,20 +7,32 @@
 genu(mat, start, end)
 }
 \arguments{
-\item{mat}{A k by 3 matrix. First column is initial value. Second column is the log function value of initial value. Thrid column is the derivative of the log function of initial value.}
+\item{mat}{the output from the function \ code {InitTk}. A k by 3 matrix which its first column are initial points, second column are log of the density function and third column are the derivatives of log density function. k is the total number of initial points.}
 
-\item{start}{lower bound}
+\item{lower}{bound of the density function.}
 
-\item{end}{upper bound}
+\item{upper}{bound of the density function.}
 }
 \value{
-list contains coefficients and breaks
+a list which first element is the intercept(b) and slope(a) of the tangent lines of log density function and second element is the intersection of these tangent lines.
 }
 \description{
 Generate coefficients and breaks
 }
 \examples{
 
+#standard normal distribution
+hfun <- function(x) dnorm(x, log=TRUE)
+h <- 1e-8
+hfun_deriv <- function(x) (hfun(x + h) - hfun(x - h))/(2*h)
+
+#Construct mat
+Tk <- c(-1, 1)
+mat <- cbind(Tk, hfun(Tk), hfun_deriv(Tk))
+mat
+
+#Generate intercept, slope and breaks
+genu(mat, start=-Inf, end=Inf)
 }
 \author{
 Chao Mao, Xian Shi, Chih-Hui Wang, Luyun Zhao

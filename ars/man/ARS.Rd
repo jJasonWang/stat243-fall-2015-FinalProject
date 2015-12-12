@@ -9,13 +9,13 @@ ars(n, func, start = -Inf, end = Inf, hfun_deriv = NULL, ...)
 \arguments{
 \item{n}{number of sample size.}
 
-\item{func}{the density function of interest, not need to be normalized.}
+\item{func}{the density function of interest.}
 
-\item{start}{lower bound. (optional)}
+\item{start}{lower bound of the density function.}
 
-\item{end}{upper bound. (optional)}
+\item{end}{upper bound of the density function.}
 
-\item{hfun_deriv}{the derivative of the density function. (optional)}
+\item{hfun_deriv}{the derivatives of log density function.}
 
 \item{...}{further arguments passed to or from other methods.}
 }

@@ -7,18 +7,33 @@
 samplex(u, y)
 }
 \arguments{
-\item{u}{list contains coefficients and breaks}
+\item{u}{the output from \code{genu} function. A list which first element is the intercept and slope of the tangent lines of log density function and second element is the intersection of these tangent lines.}
 
-\item{y}{uniform random number}
+\item{y}{numbers between 0 and 1. To decide where the point should sample from.}
 }
 \value{
-x value
+a vector contains sample that pass the squeezing test.
 }
 \description{
 Sample the x value from S(x)
 }
 \examples{
 
+#standard normal distribution
+hfun <- function(x) dnorm(x, log=TRUE)
+h <- 1e-8
+hfun_deriv <- function(x) (hfun(x + h) - hfun(x - h))/(2*h)
+
+#Construct mat
+Tk <- c(-1, 1)
+mat <- cbind(Tk, hfun(Tk), hfun_deriv(Tk))
+mat
+
+#Generate intercept, slope and breaks
+u <- genu(mat, start=-Inf, end=Inf)
+#random number from uniform(0, 1)
+y <- runif(1)
+samplex(u, y)
 }
 \author{
 Chao Mao, Xian Shi, Chih-Hui Wang, Luyun Zhao
