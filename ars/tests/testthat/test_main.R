@@ -6,7 +6,7 @@ test_that("sampling returns error for not log-concave functions",{
 })
 
 test_that("sampling returns error with large deviation",{
-  expect_error(ars(n=10,dnorm,sd=10000),"Failed to calculate z values as two adjacent points have identical derivatives! It might result from extremely large standard derivation. Reduce your standard derivation and try agian if applicable!")
+  expect_error(ars(n=10,dnorm,sd=10000),"Failed to calculate z values as two adjacent points have identical derivatives! 1, The input function might have extremely large standard derivation. Reduce your standard derivation and try agian if applicable! 2, The input function might be a modified exponential distribution. Use R built-in function dexp to sample if applicable!")
 })
 
 #Standard normal Distribution
@@ -32,9 +32,9 @@ test_that("ks.test for sample from normal distribution(10, 100)", {
 #Normal(0, 10000)
 test_that("ks.test for sample from normal distribution(0, 10000)", {
   n <- 1000; sd <- 100
-  data <- ars(n, dnorm, start=-Inf, end=Inf, mean=mu, sd=sd)
+  data <- ars(n, dnorm, start=-Inf, end=Inf, sd=sd)
   #Generate normal random number from normal distribution
-  normal <- rnorm(n, mu, sd)
+  normal <- rnorm(n, sd=sd)
 
   expect_more_than(ks.test(data, normal)$p.value, 0.05)
 })
