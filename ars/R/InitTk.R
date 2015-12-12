@@ -16,7 +16,7 @@
 #' hfun <- function(x) dnorm(x, log=TRUE)
 #' h <- 1e-8
 #' hfun_deriv <- function(x) (hfun(x + h) - hfun(x - h))/(2*h)
-#' InitTk(hfun, hfun_deriv, -Inf, Inf)
+#' initTk(hfun, hfun_deriv, -Inf, Inf)
 
 initTk <- function(hfun, hfun_deriv, start, end){
   # Construct c(x, hfun, hfun_deriv)

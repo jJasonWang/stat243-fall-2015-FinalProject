@@ -28,7 +28,7 @@ set.seed(0)
 hfun <- function(x) dnorm(x, log=TRUE)
 h <- 1e-8
 hfun_deriv <- function(x) (hfun(x + h) - hfun(x - h))/(2*h)
-InitTk(hfun, hfun_deriv, -Inf, Inf)
+initTk(hfun, hfun_deriv, -Inf, Inf)
 }
 \author{
 Chao Mao, Xian Shi, Chih-Hui Wang, Luyun Zhao
