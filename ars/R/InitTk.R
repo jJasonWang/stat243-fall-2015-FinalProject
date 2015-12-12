@@ -1,4 +1,4 @@
-#' InitTk
+#' initTk
 #'
 #' Generate the initial value for Adaptive rejection sampling
 #'
