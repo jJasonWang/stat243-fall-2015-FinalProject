@@ -24,7 +24,7 @@ ars <- function(n, func, start=-Inf, end=Inf, hfun_deriv=NULL, ...){
   }
   #Check end and start
   if(end <= start){
-    stop("Invalid x interval!")
+    stop("Invalid x interval")
   }
   # Construct h(x).
   # Check whether users provide "log" keywords;
