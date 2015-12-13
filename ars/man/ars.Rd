@@ -29,7 +29,7 @@ Adaptive rejection sampling
 
 #Sample from normal distribution
 n <- 100
-ARS(n, dnorm)
+ars(n, dnorm)
 }
 \author{
 Chao Mao, Xian Shi, Chih-Hui Wang, Luyun Zhao

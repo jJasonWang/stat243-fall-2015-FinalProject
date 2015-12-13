@@ -18,7 +18,6 @@
 #' hfun_deriv <- function(x) (hfun(x + h) - hfun(x - h))/(2*h)
 #' initTk(hfun, hfun_deriv, -Inf, Inf)
 
-
 initTk <- function(hfun, hfun_deriv, start, end){
 
   # Construct c(x, hfun, hfun_deriv)
