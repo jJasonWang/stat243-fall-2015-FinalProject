@@ -26,6 +26,7 @@
 #' samplex(u, y)
 
 samplex <- function(u, y){
+
   # Inverse CDF method is used.
   # Calculate the list of areas
   z <- u$breaks

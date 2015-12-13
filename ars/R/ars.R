@@ -17,6 +17,7 @@
 #' n <- 100
 #' ARS(n, dnorm)
 
+
 ars <- function(n, func, start=-Inf, end=Inf, hfun_deriv=NULL, ...){
   # Construct h(x).
   # Check whether users provide "log" keywords;

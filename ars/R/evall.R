@@ -23,6 +23,7 @@
 #' evall(-0.5, Tk, hfun.x)
 
 evall <- function(x1, Tk, hfun.x){
+
   k <- length(Tk)
   # Grouping
   group <- cut(x1, breaks = Tk, labels=1:(k-1))

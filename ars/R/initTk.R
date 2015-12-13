@@ -18,7 +18,9 @@
 #' hfun_deriv <- function(x) (hfun(x + h) - hfun(x - h))/(2*h)
 #' initTk(hfun, hfun_deriv, -Inf, Inf)
 
+
 initTk <- function(hfun, hfun_deriv, start, end){
+
   # Construct c(x, hfun, hfun_deriv)
   xhfunp <- function(x){
     return(c(x, hfun(x), hfun_deriv(x)))
@@ -26,7 +28,7 @@ initTk <- function(hfun, hfun_deriv, start, end){
 
   # Iteration parameters
   m <- 1
-  m.max <- 50
+  m.max <- 5000 # maximum number of iteration steps
 
   # Four different scenario regarding x intervals are considered:
   # 1 - [-Inf, Inf]
@@ -44,7 +46,7 @@ initTk <- function(hfun, hfun_deriv, start, end){
     if (mat.temp[3] < 0){
       mat <- mat.temp
       while (mat.temp[3] <= 0 && m < m.max) {
-        mat.temp <- xhfunp(mat.temp[1]-(2^m)*runif(1))
+        mat.temp <- xhfunp(mat.temp[1]-(2^(min(5, abs(mat.temp[3]))))*runif(1))
         mat <- rbind(mat, mat.temp)
         mat.temp.pre <- mat.temp
         m <- m + 1
@@ -52,7 +54,7 @@ initTk <- function(hfun, hfun_deriv, start, end){
     } else if (mat.temp[3] > 0) {
       mat <- mat.temp
       while (mat.temp[3] >= 0 && m < m.max) {
-        mat.temp <- xhfunp(mat.temp[1]+(2^m)*runif(1))
+        mat.temp <- xhfunp(mat.temp[1]+(2^(min(5, abs(mat.temp[3]))))*runif(1))
         mat <- rbind(mat, mat.temp)
         mat.temp.pre <- mat.temp
         m <- m + 1
@@ -75,7 +77,7 @@ initTk <- function(hfun, hfun_deriv, start, end){
     }
     mat.temp.pre <- mat.temp
     while (mat.temp[3] <= 0 && m < m.max) {
-      mat.temp <- xhfunp(mat.temp[1] - (2^m)*runif(1))
+      mat.temp <- xhfunp(mat.temp[1] - (2^(min(5, abs(mat.temp[3]))))*runif(1))
       mat <- rbind(mat, mat.temp)
       mat.temp.pre <- mat.temp
       m <- m + 1
@@ -97,7 +99,7 @@ initTk <- function(hfun, hfun_deriv, start, end){
     }
     mat.temp.pre <- mat.temp
     while (mat.temp[3] >= 0 && m < m.max) {
-      mat.temp <- xhfunp(mat.temp[1] + (2^m)*runif(1))
+      mat.temp <- xhfunp(mat.temp[1] + (2^(min(5, abs(mat.temp[3]))))*runif(1))
       mat <- rbind(mat, mat.temp)
       mat.temp.pre <- mat.temp
       m <- m + 1
@@ -108,8 +110,14 @@ initTk <- function(hfun, hfun_deriv, start, end){
     mat <- rbind(xhfunp(a), xhfunp(b))
   }
   if (m == m.max){
-    stop("Failed to calculate z values as two adjacent points have identical derivatives! 1, The input function might have extremely large standard derivation. Reduce your standard derivation and try agian if applicable! 2, The input function might be a modified exponential distribution. Use R built-in function dexp to sample if applicable!")
+    stop("Failed to find initial abscissae!
+         1, The input function might have extremely large standard derivation.
+         Reduce your standard derivation and try agian if applicable!
+         2, The input function might be a modified exponential distribution.
+         Use R built-in function dexp to sample if applicable!")
   }
-  mat <- mat[order(mat[, 1]), ]
+  len.mat <- length(mat[, 1])
+  mat1 <- rbind(mat[len.mat - 1, ], mat[len.mat, ])
+  mat <- mat1[order(mat1[, 1]), ]
   return(mat)
 }

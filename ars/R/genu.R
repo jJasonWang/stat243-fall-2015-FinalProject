@@ -24,6 +24,7 @@
 
 
 genu <- function(mat, start, end){
+
   # Calculate z vector
   Tk <- mat[, 1]
   hfun.x <- mat[, 2]
@@ -32,7 +33,11 @@ genu <- function(mat, start, end){
 
   z <- (hfun.x[-1] - hfun.x[-k] - Tk[-1] * hfun_deriv.x[-1] + Tk[-k] * hfun_deriv.x[-k])/(hfun_deriv.x[-k] - hfun_deriv.x[-1])
   if (sum(hfun_deriv.x[-k] - hfun_deriv.x[-1] == 0) > 0){
-    stop("Failed to calculate z values as two adjacent points have identical derivatives! 1, The input function might have extremely large standard derivation. Reduce your standard derivation and try agian if applicable! 2, The input function might be a modified exponential distribution. Use R built-in function dexp to sample if applicable!")
+    stop("Failed to calculate z values as two adjacent points have identical derivatives!
+         1, The input function might have extremely large standard derivation.
+         Reduce your standard derivation and try agian if applicable!
+         2, The input function might be a modified exponential distribution.
+         Use R built-in function dexp to sample if applicable!")
   }
 
   # Construct upper and lower bound
@@ -44,4 +49,4 @@ genu <- function(mat, start, end){
 
   res <- list(parameter=cbind(a, b), breaks = z)
   return(res)
-}
+  }

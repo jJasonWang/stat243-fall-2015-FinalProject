@@ -26,6 +26,7 @@
 #' evalu(-0.5, u)
 
 evalu <- function(x.temp, u){
+
   # Check if x.temp is out of bounds.
   # if (x.temp < head(u$breaks,n=1) || x.temp > tail(u$breaks,n=1)){
   #   stop("x.temp is out of bound.")
