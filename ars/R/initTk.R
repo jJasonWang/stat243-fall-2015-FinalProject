@@ -27,7 +27,7 @@ initTk <- function(hfun, hfun_deriv, start, end){
 
   # Iteration parameters
   m <- 1
-  m.max <- 5000 # maximum number of iteration steps
+  m.max <- 500 # maximum number of iteration steps
 
   # Four different scenario regarding x intervals are considered:
   # 1 - [-Inf, Inf]

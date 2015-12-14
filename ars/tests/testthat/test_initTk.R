@@ -28,11 +28,4 @@ test_that(,{
   actual = unname(initTk(h,h_deriv,-10,10)[,1])
   expect=c(-3.333333333333333037274,3.333333333333333037274)
   expect_equal(actual,expect)
-  #testing not log concave t-distribution
-  h <- function(x){
-    return (log(dt(x,1)))
-  }
-  actual = unname(initTk(h, h_deriv,-Inf,Inf)[,1])
-  expect = c(-2.894615736882233392180,-2.129839822742187749327,1.348923560139692057191)
-  expect_equal(actual,expect)
 })
