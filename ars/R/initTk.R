@@ -110,10 +110,8 @@ initTk <- function(hfun, hfun_deriv, start, end){
   }
   if (m == m.max){
     stop("Failed to find initial abscissae!
-         1, The input function might have extremely large standard derivation.
-         Reduce your standard derivation and try agian if applicable!
-         2, The input function might be a modified exponential distribution.
-         Use R built-in function dexp to sample if applicable!")
+         The input function might have extremely large standard derivation.
+         Reduce your standard derivation and try agian if applicable!")
   }
   len.mat <- length(mat[, 1])
   mat1 <- rbind(mat[len.mat - 1, ], mat[len.mat, ])
