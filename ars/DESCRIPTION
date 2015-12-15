@@ -4,7 +4,6 @@ Title: Adaptive Rejection Sampling
 Version: 0.1
 Date: 2015-12-09
 Author: Chao Mao, Xian Shi, Chih-Hui Wang, Luyun Zhao
-<<<<<<< HEAD
 LazyData: TRUE
 RoxygenNote: 5.0.1
 Imports:
