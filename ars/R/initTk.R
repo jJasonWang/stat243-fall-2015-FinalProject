@@ -6,7 +6,7 @@
 #' @param hfun_deriv the derivatives of log density function.
 #' @param start lower bound of the density function.
 #' @param end upper bound of the density function.
-#' @return a k by 3 matrix which its first column are initial points, second column are log of the density function and third column are the derivatives of log density function. k is the total number of initial points.
+#' @return a k by 3 matrix which its first column are initial points,  the second column are the logs of the density function and third column are the derivatives of log density function. k is the total number of initial points
 #' @author Chao Mao, Xian Shi, Chih-Hui Wang, Luyun Zhao
 #' @export
 #' @examples
@@ -27,7 +27,7 @@ initTk <- function(hfun, hfun_deriv, start, end){
 
   # Iteration parameters
   m <- 1
-  m.max <- 500 # maximum number of iteration steps
+  m.max <- 5000 # maximum number of iteration steps
 
   # Four different scenario regarding x intervals are considered:
   # 1 - [-Inf, Inf]
@@ -110,8 +110,10 @@ initTk <- function(hfun, hfun_deriv, start, end){
   }
   if (m == m.max){
     stop("Failed to find initial abscissae!
-         The input function might have extremely large standard derivation.
-         Reduce your standard derivation and try agian if applicable!")
+         1, The input function might have extremely large standard derivation.
+         Reduce your standard derivation and try agian if applicable!
+         2, The input function might be a modified exponential distribution.
+         Use R built-in function dexp to sample if applicable!")
   }
   len.mat <- length(mat[, 1])
   mat1 <- rbind(mat[len.mat - 1, ], mat[len.mat, ])

@@ -1,11 +1,11 @@
 #' genu
 #'
 #' Generate coefficients and breaks
-#' @param mat the output from the function \ code {InitTk}. A k by 3 matrix which its first column are initial points, second column are log of the density function and third column are the derivatives of log density function. k is the total number of initial points.
+#' @param mat the output from the function \ code {InitTk}. A k by 3 matrix which its first column are initial points,  the second column are the logs of the density function and third column are the derivatives of log density function. k is the total number of initial points
 #' @param lower bound of the density function.
 #' @param upper bound of the density function.
 #' @author Chao Mao, Xian Shi, Chih-Hui Wang, Luyun Zhao
-#' @return a list which first element is the intercept(b) and slope(a) of the tangent lines of log density function and second element is the intersection of these tangent lines.
+#' @return a list which first element is the intercept(b) and slope(a) of the tangent lines of log density function and the second element is the intersection of these tangent lines.
 #' @export
 #' @examples
 #'

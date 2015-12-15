@@ -3,7 +3,7 @@
 #' Evaluate the upper bound value
 #'
 #' @param x.temp points that want to evalue upper bound.
-#' @param u the output from \code{genu} function. A list which first element is the intercept and slope of the tangent lines of log density function and second element is the intersection of these tangent lines.
+#' @param u the output from \code{genu} function. A list which first element is the intercept(b) and slope(a) of the tangent lines of log density function and the second element is the intersection of these tangent lines.
 #' @return a vector. Upper bound value of the log density function for squeezing test.
 #' @author Chao Mao, Xian Shi, Chih-Hui Wang, Luyun Zhao
 #' @export
