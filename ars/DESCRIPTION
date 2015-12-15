@@ -5,12 +5,12 @@ Version: 0.1
 Date: 2015-12-09
 Author: Chao Mao, Xian Shi, Chih-Hui Wang, Luyun Zhao
 Maintainer: N/A
-Description: Gilks et al. 1992
+Description: Details in Gilks et al 1992
 License: N/A
 LazyData: TRUE
 RoxygenNote: 5.0.1
 Imports:
-    devtools,
-    testthat,
-    pracma
+	devtools,
+	testthat,
+	pracma
 Suggests:
